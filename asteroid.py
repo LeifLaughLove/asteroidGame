@@ -6,13 +6,15 @@ import random
 class Asteroid(CircleShape):
     def __init__(self, x, y, radius, velocity=None):
         super().__init__(x, y, radius)
+        self.image = pygame.image.load("resources/rock.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image,(self.radius * 2, self.radius *2))
         if velocity is not None:
             self.velocity = velocity
 
     def draw(self, screen):
-        return pygame.draw.circle(screen, (255, 255, 255), self.position, self.radius, 2)
+        return screen.blit(self.image, self.image.get_rect(center=self.position))
 
-    def update(self, dt):
+    def update(self, dt, score=None):
         self.position += self.velocity * dt
     
     def split(self):
