@@ -9,6 +9,13 @@ from powerup import PowerUp
 from button import Button
 from shot import Shot
 
+    #                                              ---- My Asteroid Game ----
+    #                         still being updated, so far there's a main menu with one button, 
+    #                         when the start button is clicked the game begins with your spaceship 
+    #                         in the center of the screen. Asteroids start coming in at a slower pace. 
+    #                         Every 10 seconds a speed power up spawns in. The game gets progressively 
+    #                         more difficult in 3 stages, casuing more asteroids to spawn at a higher rate.
+
 
 def main(): 
     print(f"Starting Asteroids! \nScreen width: {SCREEN_WIDTH} \nScreen height: {SCREEN_HEIGHT}")
@@ -23,19 +30,29 @@ def main():
     start_button_x = (SCREEN_WIDTH - button_width) // 2
     start_button_y = (SCREEN_HEIGHT - button_height) // 2
     start_button = Button("Start", (start_button_x, start_button_y), (button_width, button_height), font, (100,128, 255), (255, 255, 255))
+    #--------------------------------------------------------------------------------------------------------------------------------------
 
-
+    # The players score is set to 0, allowing running to be True
+    #     and game_state set to menu i include it in my loop so 
+    #     the asteroids can move across too
     score = 0
     game_state = "menu"
     running = True
     
+    #clock 
     clock = pygame.time.Clock()
     dt = 0
     game_time = 0
     
     x = SCREEN_WIDTH / 2
     y = SCREEN_HEIGHT / 2
+    #--------------------------------------
 
+
+    # Set up sprite groups:
+    # - 'updatable' holds all objets that need to update each frame
+    # - 'drawable' holds all objects that get drawn to the screen
+    # - 'asteroids, 'shots', and 'powerups'are specific subgroups for logic or collision checks
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -57,7 +74,7 @@ def main():
     
     PowerUpField.Containers = (updatable)
     powerupfield = PowerUpField()
-
+    #----------------------------------------------------------
     
 
     

@@ -42,12 +42,18 @@ class AsteroidField(pygame.sprite.Sprite):
         self.game_state = game_state
         self.spawn_timer += dt
 
+        #This section causes more asteroids to spawn depending on the player's score
         if game_state == "menu":
             self.spawn_rate = 0.1
-        if score > 10:
-            self.spawn_rate = 0.5
+        if score > 1000:
+            self.spawn_rate = 0.075
+        if score > 5000:
+            self.spawn_rate = 0.2
+        if score > 1000:
+            self.spawn_rate = 0.3
         if self.spawn_timer > self.spawn_rate:
             self.spawn_timer = 0
+        #---------------------------------------------------------------------------
 
             # spawn a new asteroid at a random edge
             edge = random.choice(self.edges)
