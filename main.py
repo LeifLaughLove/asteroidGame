@@ -84,7 +84,11 @@ def main():
     PowerUpField.Containers = (updatable)
     powerupfield = PowerUpField()
     #----------------------------------------------------------
-    top_scores = get_leaderboard()
+    try:
+        top_scores = get_leaderboard()
+    except Exception as e:
+        print(f"Warning: Could not connect to leaderboard server — {e}")
+        top_scores = []
 
         #-----MAIN LOOP----#
 

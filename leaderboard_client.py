@@ -3,9 +3,12 @@ import os
 from datetime import date
 from dotenv import load_dotenv
 
+    # This file handles the leaderboard functionality, when using a it connects to the server URL to either get top scores or post a score
+    # for it to connect to a server, the SERVER_URL needs to be set in a .env file.
+    # If SERVER_URL is not defined, it defaults to http://localhost:5000 for local use.
 
 load_dotenv()
-SERVER_URL = os.environ.get("SERVER_URL")
+SERVER_URL = os.environ.get("SERVER_URL", "http://localhost:5000")
 
 def post_score(name, score):
     payload = {

@@ -5,7 +5,7 @@ from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from dotenv import load_dotenv
 
 load_dotenv()
-SERVER_URL = os.environ.get("SERVER_URL")  
+SERVER_URL = os.environ.get("SERVER_URL", "http://localhost:5000")  
 
 def get_top_scores(limit=5):
     try:
