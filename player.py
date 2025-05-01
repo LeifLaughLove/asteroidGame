@@ -3,6 +3,7 @@ from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED, PLAYER_SHO
 from circleshape import CircleShape
 from shot import Shot
 
+
 class Player(CircleShape):
     containers = None
     def __init__(self, x, y):
@@ -117,3 +118,30 @@ class Player(CircleShape):
         self.rotation = 0
         self.speed = PLAYER_SPEED
         self.respawn_timer = game_time
+
+
+
+    
+def get_player_name(screen):
+    font = pygame.font.Font(None, 48)
+    name = ""
+    input_active = True
+
+    while input_active:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return None
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    input_active = False
+                elif event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+                else:
+                    name += event.unicode
+
+        screen.fill((0, 0, 0))
+        text = font.render(f"Enter Name: {name}", True, (255, 255, 255))
+        screen.blit(text, (SCREEN_WIDTH//2 - text.get_width()//2, SCREEN_HEIGHT//2))
+        pygame.display.flip()
+
+    return name

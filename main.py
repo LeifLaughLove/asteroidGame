@@ -1,13 +1,16 @@
 import pygame
 pygame.font.init()
 from constants import *
-from player import Player
+from player import Player, get_player_name
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from powerupfield import PowerUpField
 from powerup import PowerUp
 from button import Button
 from shot import Shot
+from leaderboard import draw_leaderboard_panel, save_score
+from leaderboard_client import post_score, get_leaderboard
+import time
 
     #                                              ---- My Asteroid Game ----
     #                         still being updated, so far there's a main menu with one button, 
@@ -24,12 +27,15 @@ def main():
     background = pygame.image.load("resources/background.png").convert()
 
 
-    #This is all for my button, I only have 1 right now and it's the start button when t he application is launched
+    #This is all for my button, I only have 1 right now and it's the start button when the application is launched
     font = pygame.font.Font(None, 36)
     button_width, button_height = 200, 100
-    start_button_x = (SCREEN_WIDTH - button_width) // 2
+    menu_buttons_x = (SCREEN_WIDTH - button_width) // 2
     start_button_y = (SCREEN_HEIGHT - button_height) // 2
-    start_button = Button("Start", (start_button_x, start_button_y), (button_width, button_height), font, (100,128, 255), (255, 255, 255))
+    start_button = Button("Start", (menu_buttons_x, start_button_y), (button_width, button_height), font, (100,128, 255), (255, 255, 255))
+
+    leaderboard_button_y = start_button_y + 200
+    leaderboard_button = Button("Leaderboard", (menu_buttons_x, leaderboard_button_y), (button_width, button_height), font, (100,128, 255), (255, 255, 255))
     #--------------------------------------------------------------------------------------------------------------------------------------
 
     # The players score is set to 0, allowing running to be True
@@ -37,6 +43,9 @@ def main():
     #     the asteroids can move across too
     score = 0
     game_state = "menu"
+    leaderboard_state = False
+    last_leaderboard_click_time = 0
+    leaderboard_click_cooldown = 0.3
     running = True
     
     #clock 
@@ -75,9 +84,7 @@ def main():
     PowerUpField.Containers = (updatable)
     powerupfield = PowerUpField()
     #----------------------------------------------------------
-    
-
-    
+    top_scores = get_leaderboard()
 
         #-----MAIN LOOP----#
 
@@ -102,6 +109,18 @@ def main():
                 asteroid.draw(screen)        # draw them before the button
 
             start_button.draw(screen)
+            leaderboard_button.draw(screen)
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                current_time = time.time()
+                if leaderboard_button.is_clicked(event) and (current_time - last_leaderboard_click_time) > leaderboard_click_cooldown:
+                    leaderboard_state = not leaderboard_state
+                    last_leaderboard_click_time = current_time
+            if leaderboard_state:
+                draw_leaderboard_panel(screen, top_scores)
+                    
+                        
+
             pygame.display.flip()
             dt = clock.tick(60) / 1000
 
@@ -133,7 +152,10 @@ def main():
                             player.lives -= 1
                             if player.lives < 0:
                                 print("Game Over")
-                                running = False
+                                game_state = "menu"
+                                name = get_player_name(screen)
+                                post_score(name, score)
+                                top_scores = get_leaderboard()
                             else:
                                 player.respawn( game_time, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
