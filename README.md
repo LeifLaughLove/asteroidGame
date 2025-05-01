@@ -53,7 +53,7 @@ cd asteroidGame
 ### 4. Leaderboard (OPTIONAL)
 
 ```
-the leaderboard will work locally how it is now, but to make it connect to an online server one must be created.
+THE GAME WILL RUN WITHOUT SETTING UP THE LEADERBOARD
 ```
 
   
