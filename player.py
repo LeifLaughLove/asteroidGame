@@ -4,40 +4,51 @@ from circleshape import CircleShape
 from shot import Shot
 
 
+# PLAYER.PY HANDLES THE PLAYER LOGIC AND MOVEMENT IN THE GAME ALSO UPDATES THE SHIP SPRITE WHEN THE SHIP IS MOVING 
+
 class Player(CircleShape):
     containers = None
-    def __init__(self, x, y):
+    def __init__(self, x, y, ship):
         super().__init__(x,y, PLAYER_RADIUS)
+        self.image = pygame.image.load(ship.image_path).convert_alpha()
+        self.original_image = self.image
+        self.rect = self.image.get_rect(center=(x, y))
         self.rotation = 0
         self.timer = 0
         self.lives = 3
         self.respawn_timer = 0
 
 
-        # these variables are for speed, powerUp deals with the speed power up and only allows it to last
-        # for 5 seconds
+
         self.speed = PLAYER_SPEED
         self.speed_power_up_status = False
         self.speed_power_up_timer = 0
         self.speed_power_up_duration = 5
 
+        self.frames = ship.sprite
+        self.frame_speed = 5
+        self.tick_count = 0
+        self.current_frame = 0
+
+        self.gun1_damage = ship.gun1_damage
+
     # in the player class
     def triangle(self):
-        forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
+        forward = pygame.Vector2(0,-1).rotate(self.rotation)
+        right = pygame.Vector2(0,-1).rotate(self.rotation + 90) * self.radius / 1.5
         a = self.position + forward * self.radius
         b = self.position - forward * self.radius - right
         c = self.position - forward * self.radius + right
         return [a, b, c]
     
     def draw(self, screen):
-        return pygame.draw.polygon(screen,"white",self.triangle(),2)
-    
-    def rotate(self, dt):
-        self.rotation += PLAYER_TURN_SPEED * dt
-    
-    def update(self, dt, score=None):
+        #return pygame.draw.polygon(screen,"white",self.triangle(),2)
+        rotated_image = pygame.transform.rotate(self.image, -self.rotation)
+        rotated_rect = rotated_image.get_rect(center=self.position)
+        screen.blit(rotated_image, rotated_rect.topleft)
 
+    
+    def update(self, dt, score=None, level=None):
         if self.speed_power_up_status:
             self.speed_power_up_timer += dt
             if self.speed_power_up_timer >= self.speed_power_up_duration:
@@ -65,7 +76,7 @@ class Player(CircleShape):
 
         if keys[pygame.K_d] :
             Player.rotate(self, dt)
-        
+
         if keys[pygame.K_w] :
             Player.move(self, dt)
         
@@ -73,17 +84,27 @@ class Player(CircleShape):
             Player.move(self, -dt)
 
         if keys[pygame.K_SPACE]:
-            Player.shoot(self)
+            Player.shoot_gun_1(self)
+
+        if keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_a] or keys[pygame.K_d]:
+            spaceship_sprite_update(self, dt)
+        else:
+            self.image = self.original_image
+            self.rect = self.image.get_rect(center=self.rect.center)
     
+    def rotate(self, dt):
+        self.rotation += PLAYER_TURN_SPEED * dt
+        spaceship_sprite_update(self, dt)
 
     def move(self, dt):
-        forward = pygame.Vector2(0, 1).rotate(self.rotation)
+        forward = pygame.Vector2(0,-1).rotate(self.rotation)
         self.position += forward * self.speed * dt
+        spaceship_sprite_update(self, dt)
 
-    def shoot(self):
+    def shoot_gun_1(self):
         if self.timer < 0:
-            shot = Shot(self.position.x, self.position.y, self.radius)
-            shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
+            shot = Shot(self.position.x, self.position.y, self.radius, self.gun1_damage)
+            shot.velocity = pygame.Vector2(0,-1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
             self.timer = PLAYER_SHOOT_COOLDOWN
     
 
@@ -145,3 +166,19 @@ def get_player_name(screen):
         pygame.display.flip()
 
     return name
+
+def spaceship_sprite_update(self, dt):
+    
+    self.tick_count += 1
+
+    if self.tick_count % self.frame_speed == 0:
+        self.current_frame += 1
+        
+        if self.current_frame < len(self.frames):
+            self.image = self.frames[self.current_frame]
+            self.rect = self.image.get_rect(center=self.rect.center)
+        
+        else:
+            self.current_frame = 0
+            self.image = self.frames[self.current_frame]
+            self.rect = self.image.get_rect(center=self.rect.center)

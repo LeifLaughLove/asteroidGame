@@ -1,10 +1,12 @@
 import pygame
 
+# CIRCLESHAPE.PY HANDLES THE BASIC CIRCLESHAPE FOR HITBOXES IN THE GAME
+
 class CircleShape(pygame.sprite.Sprite):
     def __init__(self, x, y, radius):
-
-        if hasattr(self, "containers"):
-            super().__init__(self.containers)
+        
+        if hasattr(self.__class__, "containers"):
+            super().__init__(*self.__class__.containers)
         else:
             super().__init__()
 
@@ -15,6 +17,7 @@ class CircleShape(pygame.sprite.Sprite):
     def collision(self, object):
         distance = self.position.distance_to(object.position)
         return distance < (self.radius + object.radius)
+        
 
     def draw(self, screen):
         pass

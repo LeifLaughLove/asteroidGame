@@ -1,5 +1,6 @@
 import pygame
 
+# BUTTON.PY IS A SIMPLE BUTTON CLASS TO ALLOW BUTTONS TO BE DRAWN AND CLICKED
 
 class Button:
     def __init__(self, text, pos, size, font, bg_color, text_color):
@@ -13,7 +14,6 @@ class Button:
 
 
     def draw(self, screen):
-        print("draw")
         pygame.draw.rect(screen, self.bg_color, self.rect)
         screen.blit(self.text_surf,self.text_rect)
 

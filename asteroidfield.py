@@ -3,6 +3,7 @@ import random
 from asteroid import Asteroid
 from constants import *
 
+# ASTEROIDFIELD.PY HANDLES THE SPAWNING OF ASTEROIDS IN TEH GAME 
 
 class AsteroidField(pygame.sprite.Sprite):
     print("hello")
@@ -38,13 +39,10 @@ class AsteroidField(pygame.sprite.Sprite):
         asteroid = Asteroid(position.x, position.y, radius)
         asteroid.velocity = velocity
 
-    def update(self, dt, score, game_state=None):
-        self.game_state = game_state
+    def update(self, dt, score, level):
         self.spawn_timer += dt
 
         #This section causes more asteroids to spawn depending on the player's score
-        if game_state == "menu":
-            self.spawn_rate = 0.1
         if score > 1000:
             self.spawn_rate = 0.075
         if score > 5000:
@@ -58,7 +56,7 @@ class AsteroidField(pygame.sprite.Sprite):
             # spawn a new asteroid at a random edge
             edge = random.choice(self.edges)
             speed = random.randint(40,100)
-            if score > 10 or game_state == "menu":
+            if score > 10 or level == 2:
                 speed = random.randint(100, 200)
             velocity = edge[0] * speed
             velocity = velocity.rotate(random.randint(-30, 30))
@@ -66,3 +64,19 @@ class AsteroidField(pygame.sprite.Sprite):
             kind = random.randint(1, ASTEROID_KINDS)
             self.spawn(ASTEROID_MIN_RADIUS * kind, position, velocity)
             self.spawn_rate = 0.8
+
+    def menu_asteroids(self, dt):
+        self.spawn_timer += dt
+        self.spawn_rate = 0.5
+
+        if self.spawn_timer > self.spawn_rate:
+            self.spawn_timer = 0
+
+            edge = random.choice(self.edges)
+            speed = random.randint(100,200)
+        
+            velocity = edge[0] * speed
+            velocity = velocity.rotate(random.randint(-30, 30))
+            position = edge[1](random.uniform(0, 1))
+            kind = random.randint(1, ASTEROID_KINDS)
+            self.spawn(ASTEROID_MIN_RADIUS * kind, position, velocity)

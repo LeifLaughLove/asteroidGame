@@ -2,6 +2,11 @@ from circleshape import CircleShape
 import pygame
 from constants import PLAYER_SPEED
 
+#POWERUP.PY HANDLES THE POWERUPS IN THE GAME
+#ACTIVATE POWER UP OCCURS WHEN A PLAYER HITS A POWER UP, THIS LOGIC IS IN GAME.PY HANDLE_COLLISIONS FUNCTION
+# THERE IS CURRENTLY ONLY ONE POWER UP... THE SPEED POWER UP ...
+
+
 class PowerUp(CircleShape):
     def __init__(self, x, y, radius, kind="speed"):
         super().__init__(x, y, radius)
@@ -44,7 +49,7 @@ class PowerUp(CircleShape):
             self.frame_timer = 0
             self.frame_duration = 0
 
-    def update(self, dt, score=None):
+    def update(self, dt, score=None, level=None):
         self.position += self.velocity * dt
 
         if len(self.frames) > 1:
