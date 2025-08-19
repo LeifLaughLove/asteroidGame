@@ -36,8 +36,8 @@ class PowerUp(CircleShape):
             self.frame_duration = 0.15
 
         elif self.kind == "life":
-            img = pygame.image.load("resources/Speed_UP.webp").convert_alpha()
-            self.frames = [pygame.transform.scale(img, (radius * 2, radius * 2))]
+            self.image = pygame.image.load("resources/Speed_UP.webp").convert_alpha()
+            self.frames = [pygame.transform.scale(self.image, (radius * 2, radius * 2))]
             self.current_frame = 0
             self.frame_timer = 0
             self.frame_duration = 0
@@ -49,6 +49,14 @@ class PowerUp(CircleShape):
             self.frame_timer = 0
             self.frame_duration = 0
 
+        # Set initial image, rect, and mask
+        self.image = pygame.transform.scale(
+            self.frames[self.current_frame],
+            (self.radius * 3, self.radius * 3)
+        )
+        self.rect = self.image.get_rect(center=(x, y))
+        self.mask = pygame.mask.from_surface(self.image)
+
     def update(self, dt, score=None, level=None):
         self.position += self.velocity * dt
 
@@ -57,18 +65,26 @@ class PowerUp(CircleShape):
             if self.frame_timer >= self.frame_duration:
                 self.frame_timer = 0
                 self.current_frame = (self.current_frame + 1) % len(self.frames)
+                # Update image, rect, and mask when frame changes
+                self.image = pygame.transform.scale(
+                    self.frames[self.current_frame],
+                    (self.radius * 3, self.radius * 3)
+                )
+                self.rect = self.image.get_rect(center=self.position)
+                self.mask = pygame.mask.from_surface(self.image)
+            else:
+                # Always keep rect and mask in sync with position
+                self.rect.center = self.position
+        else:
+            self.rect.center = self.position
 
     def draw(self, screen):
-        image = pygame.transform.scale(
-            self.frames[self.current_frame],
-            (self.radius * 3, self.radius * 3)
-        )
-        return screen.blit(image, image.get_rect(center=self.position))
+        # No need to rescale here, just use self.image and self.rect
+        return screen.blit(self.image, self.rect)
 
     def activate_powerup(self, player):
         if self.kind == "speed" and not player.speed_power_up_status:
             player.speed *= 1.5
             player.speed_power_up_status = True
-
         elif self.kind == "life":
             player.lives += 1

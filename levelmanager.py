@@ -13,11 +13,11 @@ class LevelManager():
         open_shop = False
         self.timer += dt
 
-        if self.timer > 10:
+        if self.timer > 60:
             open_shop = True
             self.level += 1
             self.timer = 0
-            game.clear_asteroids()
+            game.clear_entities()
 
         print(self.level)
         

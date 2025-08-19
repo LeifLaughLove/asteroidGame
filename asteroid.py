@@ -7,7 +7,7 @@ import random
 # IT IS A CIRCLESHAPE THAT CAN BE DAMAGED AND SPLIT INTO SMALLER ASTEROIDS
 
 class Asteroid(CircleShape):
-    def __init__(self, x, y, radius, velocity=None):
+    def __init__(self, x, y, radius, velocity=None, damage=20):
         super().__init__(x, y, radius)
 
         self.PNG = pygame.image.load("resources/rock.png").convert_alpha()
@@ -16,6 +16,8 @@ class Asteroid(CircleShape):
         self.rect = self.image.get_rect(center=(x,y))
         self.mask = pygame.mask.from_surface(self.image)
         self.asteroid_health = ASTEROID_HEALTH
+        self.damage= damage
+        self.state = "normal"
 
         if velocity is not None:
             self.velocity = velocity
@@ -25,6 +27,8 @@ class Asteroid(CircleShape):
 
     def update(self, dt, score=None, level=None):
         self.position += self.velocity * dt
+        self.position += self.velocity * dt
+        self.rect.center = self.position
     
     def damaged(self, potential_damage):
         self.asteroid_health -= potential_damage
@@ -44,3 +48,11 @@ class Asteroid(CircleShape):
         new_radius = self.radius - ASTEROID_MIN_RADIUS
         asteroid1 = Asteroid(self.position.x, self.position.y, new_radius, vector1*1.2)
         asteroid2 = Asteroid(self.position.x, self.position.y, new_radius, vector2*1.2)
+
+    
+    def ship_collision(self):
+
+        self.PNG = pygame.image.load("resources/rockCrumbled.png").convert_alpha()
+        self.image = pygame.transform.scale(self.PNG,(self.visual_radius * 3, self.visual_radius *3))
+        self.state = "crumbled" 
+        self.velocity /= 2

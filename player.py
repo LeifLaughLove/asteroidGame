@@ -9,18 +9,22 @@ from shot import Shot
 class Player(CircleShape):
     containers = None
     def __init__(self, x, y, ship):
+
+
         super().__init__(x,y, PLAYER_RADIUS)
+
         self.image = pygame.image.load(ship.image_path).convert_alpha()
         self.original_image = self.image
         self.rect = self.image.get_rect(center=(x, y))
+        self.mask = pygame.mask.from_surface(self.image)
         self.rotation = 0
         self.timer = 0
         self.lives = 3
         self.respawn_timer = 0
 
+        self.health = ship.health
 
-
-        self.speed = PLAYER_SPEED
+        self.speed = ship.speed
         self.speed_power_up_status = False
         self.speed_power_up_timer = 0
         self.speed_power_up_duration = 5
@@ -45,14 +49,16 @@ class Player(CircleShape):
         #return pygame.draw.polygon(screen,"white",self.triangle(),2)
         rotated_image = pygame.transform.rotate(self.image, -self.rotation)
         rotated_rect = rotated_image.get_rect(center=self.position)
+        self.mask = pygame.mask.from_surface(rotated_image)
+        self.rect = rotated_rect
         screen.blit(rotated_image, rotated_rect.topleft)
-
     
     def update(self, dt, score=None, level=None):
+        self.rect.center = self.position
         if self.speed_power_up_status:
             self.speed_power_up_timer += dt
             if self.speed_power_up_timer >= self.speed_power_up_duration:
-                self.speed = PLAYER_SPEED
+                self.speed = self.speed
                 self.speed_power_up_status = False
                 self.speed_power_up_timer = 0
         self.timer -= dt
@@ -122,22 +128,18 @@ class Player(CircleShape):
         self.rotation = saved_rot
 
     #handles the player's lives to either respawn or end game
-    def got_shot(self):
+    def got_hit(self, damage, game_state):
 
-        if self.lives == 0:
-            print("game OVer")
-            return False
+        self.health -= damage
+        if self.health <= 0:
+            game_state = "menu"
         
-        elif self.lives > 0:
-            print(self.lives)
-            self.lives -= 1
-            print(self.lives)
-            return True
+        return game_state
         
     def respawn(self, game_time, x, y):
         self.position = pygame.Vector2(x, y)
         self.rotation = 0
-        self.speed = PLAYER_SPEED
+        self.speed = self.speed
         self.respawn_timer = game_time
 
 
@@ -177,8 +179,10 @@ def spaceship_sprite_update(self, dt):
         if self.current_frame < len(self.frames):
             self.image = self.frames[self.current_frame]
             self.rect = self.image.get_rect(center=self.rect.center)
+            self.mask = pygame.mask.from_surface(self.image)
         
         else:
             self.current_frame = 0
             self.image = self.frames[self.current_frame]
             self.rect = self.image.get_rect(center=self.rect.center)
+            self.mask = pygame.mask.from_surface(self.image)

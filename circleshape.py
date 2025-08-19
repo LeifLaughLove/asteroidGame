@@ -4,7 +4,7 @@ import pygame
 
 class CircleShape(pygame.sprite.Sprite):
     def __init__(self, x, y, radius):
-        
+
         if hasattr(self.__class__, "containers"):
             super().__init__(*self.__class__.containers)
         else:
@@ -14,9 +14,15 @@ class CircleShape(pygame.sprite.Sprite):
         self.velocity = pygame.Vector2(0, 0)
         self.radius = radius
 
-    def collision(self, object):
-        distance = self.position.distance_to(object.position)
-        return distance < (self.radius + object.radius)
+    def collision(self, other):
+        
+        if not hasattr(self, "mask") or not hasattr(other, "mask"):
+            raise AttributeError("Both objects must have a .mask attribute for pixel-perfect collision.")
+        if not hasattr(self, "rect") or not hasattr(other, "rect"):
+            raise AttributeError("Both objects must have a .rect attribute for pixel-perfect collision.")
+
+        offset = (int(other.rect.left - self.rect.left), int(other.rect.top - self.rect.top))
+        return self.mask.overlap(other.mask, offset) is not None
         
 
     def draw(self, screen):
